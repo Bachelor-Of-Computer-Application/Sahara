@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.sahara.controller.PatientDashboardController"
+            prefWidth="1000.0" prefHeight="650.0">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="16"
+              style="-fx-background-color: #1A5276; -fx-padding: 14 24 14 24;">
+            <Label text="Sahara"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Label text="|" style="-fx-text-fill: #5D8AA8; -fx-font-size: 18px;"/>
+            <Label text="Patient Dashboard"
+                   style="-fx-font-size: 14px; -fx-text-fill: #AED6F1;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="welcomeLabel"
+                   style="-fx-font-size: 13px; -fx-text-fill: white;"/>
+            <Button text="Log Out" onAction="#handleLogout"
+                    style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 16 6 16; -fx-background-radius: 4;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+
+            <Tab text="Browse Caregivers">
+                <VBox spacing="14"
+                      style="-fx-background-color: #F4F6F9; -fx-padding: 16 20 16 20;">
+                    <Label text="Available Caregivers"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                    <HBox spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 6;">
+                        <Label text="Care Tier:" style="-fx-font-weight: bold;"/>
+                        <ComboBox fx:id="tierFilter" promptText="All Tiers" prefWidth="180"/>
+                        <Button text="Search" onAction="#handleSearch"
+                                style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="View Profile" onAction="#handleViewProfile"
+                                style="-fx-background-color: #7D3C98; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Button text="Book Selected Caregiver" onAction="#handleBookCaregiver"
+                                style="-fx-background-color: #1E8449; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                    </HBox>
+                    <TableView fx:id="caregiverTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colName" text="Full Name" prefWidth="180"/>
+                            <TableColumn fx:id="colGender" text="Gender" prefWidth="90"/>
+                            <TableColumn fx:id="colAge" text="Age" prefWidth="60"/>
+                            <TableColumn fx:id="colExperience" text="Experience (yrs)" prefWidth="140"/>
+                            <TableColumn fx:id="colRating" text="Rating" prefWidth="90"/>
+                            <TableColumn fx:id="colBio" text="Bio" prefWidth="320"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No verified caregivers available."/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <Tab text="My Bookings">
+                <VBox spacing="14"
+                      style="-fx-background-color: #F4F6F9; -fx-padding: 16 20 16 20;">
+                    <Label text="My Booking History"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                    <HBox spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 6;">
+                        <Label text="Filter by status:" style="-fx-font-weight: bold;"/>
+                        <ComboBox fx:id="statusFilter" promptText="All" prefWidth="160"/>
+                        <Button text="Refresh" onAction="#handleRefreshBookings"
+                                style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Submit Feedback" onAction="#handleSubmitFeedback"
+                                style="-fx-background-color: #F39C12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Button text="Cancel Booking" onAction="#handleCancelBooking"
+                                style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                    </HBox>
+                    <TableView fx:id="bookingTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colBookingId" text="ID" prefWidth="50"/>
+                            <TableColumn fx:id="colHospital" text="Hospital" prefWidth="160"/>
+                            <TableColumn fx:id="colWard" text="Ward" prefWidth="80"/>
+                            <TableColumn fx:id="colAdmission" text="Admission Date" prefWidth="130"/>
+                            <TableColumn fx:id="colDays" text="Days" prefWidth="50"/>
+                            <TableColumn fx:id="colCost" text="Total Cost (NPR)" prefWidth="130"/>
+                            <TableColumn fx:id="colStatus" text="Status" prefWidth="110"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No bookings yet."/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+        </TabPane>
+    </center>
+
+</BorderPane>

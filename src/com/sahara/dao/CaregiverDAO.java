@@ -113,6 +113,44 @@ public class CaregiverDAO {
         return caregivers;
     }
 
+    public List<Caregiver> getVerifiedCaregiversByTier(int tierId) {
+        List<Caregiver> caregivers = new ArrayList<>();
+        String sql = "SELECT c.* FROM caregivers c " +
+                "JOIN caregiver_tiers ct ON c.caregiver_id = ct.caregiver_id " +
+                "WHERE c.is_verified = true AND ct.tier_id = ? " +
+                "AND ct.is_qualified = true";
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement(sql);
+            stmt.setInt(1, tierId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                caregivers.add(extractCaregiver(rs));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting caregivers by tier: " + e.getMessage());
+        }
+        return caregivers;
+    }
+
+    public List<String> getQualifiedTierNames(int caregiverId) {
+        List<String> tiers = new ArrayList<>();
+        String sql = "SELECT t.tier_name FROM caregiver_tiers ct " +
+                "JOIN care_tiers t ON ct.tier_id = t.tier_id " +
+                "WHERE ct.caregiver_id = ? AND ct.is_qualified = true " +
+                "ORDER BY t.tier_name";
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement(sql);
+            stmt.setInt(1, caregiverId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                tiers.add(rs.getString("tier_name"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting caregiver tiers: " + e.getMessage());
+        }
+        return tiers;
+    }
+
     // ─────────────────────────────────────────────
     // UPDATE — Update caregiver profile details
     // ─────────────────────────────────────────────
@@ -133,6 +171,19 @@ public class CaregiverDAO {
             return rowsAffected > 0;
         } catch (SQLException e) {
             System.out.println("Error updating caregiver: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean updateAverageRating(int caregiverId, double avgRating) {
+        String sql = "UPDATE caregivers SET avg_rating = ? WHERE caregiver_id = ?";
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement(sql);
+            stmt.setDouble(1, avgRating);
+            stmt.setInt(2, caregiverId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating caregiver rating: " + e.getMessage());
         }
         return false;
     }

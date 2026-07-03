@@ -2,25 +2,195 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.sahara.controller.DashboardController"
-      alignment="CENTER" spacing="14.0" prefWidth="420.0" prefHeight="320.0">
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.sahara.controller.CaregiverDashboardController"
+            prefWidth="1050.0" prefHeight="680.0">
 
-    <padding>
-        <Insets top="40.0" right="40.0" bottom="40.0" left="40.0"/>
-    </padding>
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="16"
+              style="-fx-background-color: #1A5276; -fx-padding: 14 24 14 24;">
+            <Label text="Sahara"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Label text="|" style="-fx-text-fill: #5D8AA8; -fx-font-size: 18px;"/>
+            <Label text="Caregiver Dashboard"
+                   style="-fx-font-size: 14px; -fx-text-fill: #AED6F1;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="welcomeLabel"
+                   style="-fx-font-size: 13px; -fx-text-fill: white;"/>
+            <Button text="Log Out" onAction="#handleLogout"
+                    style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 16 6 16; -fx-background-radius: 4;"/>
+        </HBox>
+    </top>
 
-    <Label text="Caregiver Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-    <Label fx:id="welcomeLabel" style="-fx-font-size: 16px;"/>
-    <Label fx:id="roleLabel" style="-fx-text-fill: #666666;"/>
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
 
-    <Label text="Coming soon: complete your profile, set availability, and view bookings. (New accounts await admin verification.)"
-           wrapText="true" textFill="#888888" maxWidth="Infinity"/>
+            <!-- ══════════ TAB 1: BOOKING REQUESTS ══════════ -->
+            <Tab text="Booking Requests">
+                <VBox spacing="14" style="-fx-background-color: #F4F6F9; -fx-padding: 16 20 16 20;">
+                    <Label text="Incoming Booking Requests"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                    <HBox spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 6;">
+                        <Button text="Refresh" onAction="#handleRefreshRequests"
+                                style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Accept" onAction="#handleAccept"
+                                style="-fx-background-color: #1E8449; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Button text="Decline" onAction="#handleDecline"
+                                style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                    </HBox>
+                    <TableView fx:id="requestsTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="reqColId" text="ID" prefWidth="50"/>
+                            <TableColumn fx:id="reqColPatient" text="Patient" prefWidth="160"/>
+                            <TableColumn fx:id="reqColHospital" text="Hospital" prefWidth="160"/>
+                            <TableColumn fx:id="reqColAdmission" text="Admission" prefWidth="110"/>
+                            <TableColumn fx:id="reqColDischarge" text="Discharge" prefWidth="110"/>
+                            <TableColumn fx:id="reqColCost" text="Cost (NPR)" prefWidth="110"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No pending requests right now."/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </Tab>
 
-    <Button text="Log Out" onAction="#handleLogout" maxWidth="Infinity"
-            style="-fx-padding: 8 0 8 0;"/>
-</VBox>
+            <!-- ══════════ TAB 2: ACTIVE ASSIGNMENTS ══════════ -->
+            <Tab text="Active Assignments">
+                <VBox spacing="14" style="-fx-background-color: #F4F6F9; -fx-padding: 16 20 16 20;">
+                    <Label text="Your Active Assignments"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                    <HBox spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 6;">
+                        <Button text="Refresh" onAction="#handleRefreshActive"
+                                style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                    </HBox>
+                    <TableView fx:id="activeTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="actColId" text="ID" prefWidth="50"/>
+                            <TableColumn fx:id="actColPatient" text="Patient" prefWidth="160"/>
+                            <TableColumn fx:id="actColHospital" text="Hospital" prefWidth="160"/>
+                            <TableColumn fx:id="actColAdmission" text="Admission" prefWidth="110"/>
+                            <TableColumn fx:id="actColDischarge" text="Discharge" prefWidth="110"/>
+                            <TableColumn fx:id="actColCost" text="Cost (NPR)" prefWidth="110"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No active assignments right now."/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <!-- ══════════ TAB 3: COMPLETED HISTORY ══════════ -->
+            <Tab text="Completed History">
+                <VBox spacing="14" style="-fx-background-color: #F4F6F9; -fx-padding: 16 20 16 20;">
+                    <Label text="Completed Assignment History"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                    <HBox spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 6;">
+                        <Button text="Refresh" onAction="#handleRefreshCompleted"
+                                style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                    </HBox>
+                    <TableView fx:id="completedTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="compColId" text="ID" prefWidth="50"/>
+                            <TableColumn fx:id="compColPatient" text="Patient" prefWidth="160"/>
+                            <TableColumn fx:id="compColHospital" text="Hospital" prefWidth="160"/>
+                            <TableColumn fx:id="compColAdmission" text="Admission" prefWidth="110"/>
+                            <TableColumn fx:id="compColDischarge" text="Discharge" prefWidth="110"/>
+                            <TableColumn fx:id="compColCost" text="Cost (NPR)" prefWidth="110"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No completed assignments yet."/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <!-- ══════════ TAB 4: AVAILABILITY ══════════ -->
+            <Tab text="Availability">
+                <VBox spacing="14" style="-fx-background-color: #F4F6F9; -fx-padding: 16 20 16 20;">
+                    <Label text="Set Your Availability"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                    <HBox spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 6;">
+                        <Label text="Pick a date:"/>
+                        <DatePicker fx:id="availabilityDatePicker"/>
+                        <Button text="Add Date" onAction="#handleAddAvailability"
+                                style="-fx-background-color: #1E8449; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Remove Selected" onAction="#handleRemoveAvailability"
+                                style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Button text="Refresh" onAction="#handleRefreshAvailability"
+                                style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                    </HBox>
+                    <TableView fx:id="availabilityTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="availColDate" text="Date" prefWidth="200"/>
+                            <TableColumn fx:id="availColStatus" text="Status" prefWidth="200"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="You haven't added any availability dates yet."/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <!-- ══════════ TAB 5: MY PROFILE ══════════ -->
+            <Tab text="My Profile">
+                <VBox spacing="18" style="-fx-background-color: #F4F6F9; -fx-padding: 20 24 20 24;">
+                    <Label text="My Profile"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+
+                    <GridPane hgap="12" vgap="12"
+                              style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 6;">
+                        <Label text="Name:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <Label fx:id="profileNameLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                        <Label text="Gender:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <Label fx:id="profileGenderLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                        <Label text="Age:" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <Label fx:id="profileAgeLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                        <Label text="Average Rating:" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <Label fx:id="profileRatingLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                        <Label text="Experience (years):" style="-fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                        <TextField fx:id="profileExperienceField" prefWidth="120" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                        <Label text="Bio:" style="-fx-font-weight: bold;" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                        <TextArea fx:id="profileBioArea" prefRowCount="3" wrapText="true" prefWidth="400" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                        <Button text="Save Changes" onAction="#handleSaveProfile"
+                                style="-fx-background-color: #1E8449; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20 8 20; -fx-background-radius: 4;"
+                                GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                    </GridPane>
+
+                    <Label text="Patient Feedback"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                    <ListView fx:id="feedbackListView" prefHeight="180" VBox.vgrow="ALWAYS"/>
+                </VBox>
+            </Tab>
+
+        </TabPane>
+    </center>
+
+</BorderPane>

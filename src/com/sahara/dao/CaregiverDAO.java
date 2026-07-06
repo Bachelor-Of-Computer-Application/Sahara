@@ -95,6 +95,50 @@ public class CaregiverDAO {
         return caregivers;
     }
 
+<<<<<<< HEAD
+=======
+    public List<Caregiver> getVerifiedCaregiversByTier(int tierId) {
+        List<Caregiver> caregivers = new ArrayList<>();
+        String sql = "SELECT c.* FROM caregivers c " +
+                "JOIN caregiver_tiers ct ON c.caregiver_id = ct.caregiver_id " +
+                "WHERE c.is_verified = true AND ct.tier_id = ? " +
+                "AND ct.is_qualified = true";
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement(sql);
+            stmt.setInt(1, tierId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                caregivers.add(extractCaregiver(rs));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting caregivers by tier: " + e.getMessage());
+        }
+        return caregivers;
+    }
+
+    public List<String> getQualifiedTierNames(int caregiverId) {
+        List<String> tiers = new ArrayList<>();
+        String sql = "SELECT t.tier_name FROM caregiver_tiers ct " +
+                "JOIN care_tiers t ON ct.tier_id = t.tier_id " +
+                "WHERE ct.caregiver_id = ? AND ct.is_qualified = true " +
+                "ORDER BY t.tier_name";
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement(sql);
+            stmt.setInt(1, caregiverId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                tiers.add(rs.getString("tier_name"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting caregiver tiers: " + e.getMessage());
+        }
+        return tiers;
+    }
+
+    // ─────────────────────────────────────────────
+    // UPDATE — Update caregiver profile details
+    // ─────────────────────────────────────────────
+>>>>>>> 0db93c83d672d1acc76e430a5f4746594cfc4b69
     public boolean updateCaregiver(Caregiver caregiver) {
         String sql = "UPDATE caregivers SET gender=?, age=?, address=?, " +
                 "experience_years=?, bio=? " +
@@ -114,6 +158,26 @@ public class CaregiverDAO {
         return false;
     }
 
+<<<<<<< HEAD
+=======
+    public boolean updateAverageRating(int caregiverId, double avgRating) {
+        String sql = "UPDATE caregivers SET avg_rating = ? WHERE caregiver_id = ?";
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement(sql);
+            stmt.setDouble(1, avgRating);
+            stmt.setInt(2, caregiverId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating caregiver rating: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // ─────────────────────────────────────────────
+    // UPDATE — Verify a caregiver (admin action)
+    // Sets is_verified = true
+    // ─────────────────────────────────────────────
+>>>>>>> 0db93c83d672d1acc76e430a5f4746594cfc4b69
     public boolean verifyCaregiver(int caregiverId) {
         String sql = "UPDATE caregivers SET is_verified = true WHERE caregiver_id = ?";
         try {

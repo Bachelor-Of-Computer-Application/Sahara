@@ -103,13 +103,23 @@ public class PatientDashboardController {
                 "ACTIVE", "COMPLETED", "CANCELLED"
         );
         statusFilter.getSelectionModel().selectFirst();
+        statusFilter.setOnAction(event -> loadBookings());
+        tierFilter.setOnAction(event -> loadCaregivers());
 
         loadCaregivers();
         loadBookings();
     }
 
     private void loadCaregivers() {
-        currentCaregivers = caregiverDAO.getVerifiedCaregivers();
+        int tierIndex = tierFilter.getSelectionModel().getSelectedIndex();
+        if (tierIndex > 0) {
+            CareTier selectedTier = allTiers.get(tierIndex - 1);
+            currentCaregivers = caregiverDAO.getVerifiedCaregiversByTier(
+                    selectedTier.getTierId());
+        } else {
+            currentCaregivers = caregiverDAO.getVerifiedCaregivers();
+        }
+
         ObservableList<CaregiverRow> rows =
                 FXCollections.observableArrayList();
         for (Caregiver c : currentCaregivers) {
@@ -130,8 +140,17 @@ public class PatientDashboardController {
         Patient patient = patientDAO.getPatientByUserId(userId);
         if (patient == null) return;
 
-        List<Booking> bookings =
-                bookingDAO.getBookingsByPatientId(patient.getPatientId());
+        String selectedStatus =
+                statusFilter.getSelectionModel().getSelectedItem();
+        List<Booking> bookings;
+        if (selectedStatus == null || selectedStatus.equals("All")) {
+            bookings = bookingDAO.getBookingsByPatientId(
+                    patient.getPatientId());
+        } else {
+            bookings = bookingDAO   .getBookingsByPatientIdAndStatus(
+                    patient.getPatientId(), selectedStatus);
+        }
+
         ObservableList<BookingRow> rows =
                 FXCollections.observableArrayList();
         for (Booking b : bookings) {
@@ -162,15 +181,39 @@ public class PatientDashboardController {
             showAlert("Please select a caregiver first!");
             return;
         }
+        Caregiver caregiver =
+                caregiverDAO.getCaregiverById(selected.caregiverId);
+        if (caregiver == null) {
+            showAlert("Caregiver profile not found.");
+            return;
+        }
+        User user = userDAO.getUserById(caregiver.getUserId());
+        List<String> tiers =
+                caregiverDAO.getQualifiedTierNames(caregiver.getCaregiverId());
+        List<Feedback> feedbackList =
+                feedbackDAO.getFeedbackByCaregiverId(caregiver.getCaregiverId());
+
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Caregiver Profile");
         alert.setHeaderText(selected.fullName);
         alert.setContentText(
-                "Gender     : " + selected.gender + "\n" +
-                        "Age        : " + selected.age + "\n" +
-                        "Experience : " + selected.experienceYears + " years\n" +
-                        "Rating     : " + selected.avgRating + " / 5.0\n" +
-                        "Bio        : " + selected.bio
+                "Name              : " + safeText(
+                        user != null ? user.getFullName() : selected.fullName) + "\n" +
+                        "Email             : " + safeText(
+                                user != null ? user.getEmail() : "") + "\n" +
+                        "Phone             : " + safeText(
+                                user != null ? user.getPhone() : "") + "\n" +
+                        "Gender            : " + safeText(caregiver.getGender()) + "\n" +
+                        "Age               : " + caregiver.getAge() + "\n" +
+                        "Address           : " + safeText(caregiver.getAddress()) + "\n" +
+                        "Experience        : " + caregiver.getExperienceYears()
+                        + " years\n" +
+                        "Average Rating    : " + caregiver.getAvgRating()
+                        + " / 5.0\n" +
+                        "Completed Reviews : " + feedbackList.size() + "\n" +
+                        "Qualified Tiers   : " +
+                        (tiers.isEmpty() ? "Not assigned" : String.join(", ", tiers)) + "\n\n" +
+                        "Bio:\n" + safeText(caregiver.getBio())
         );
         alert.showAndWait();
     }
@@ -383,6 +426,9 @@ public class PatientDashboardController {
                 Patient patient =
                         patientDAO.getPatientByUserId(
                                 SessionManager.getUserId());
+                if (booking == null || patient == null) {
+                    return null;
+                }
                 Feedback f = new Feedback();
                 f.setBookingId(selected.bookingId);
                 f.setPatientId(patient.getPatientId());
@@ -397,7 +443,12 @@ public class PatientDashboardController {
         dialog.showAndWait().ifPresent(feedback -> {
             boolean saved = feedbackDAO.createFeedback(feedback);
             if (saved) {
+                double avgRating = feedbackDAO.getAverageRating(
+                        feedback.getCaregiverId());
+                caregiverDAO.updateAverageRating(
+                        feedback.getCaregiverId(), avgRating);
                 showAlert("Thank you for your feedback!");
+                loadCaregivers();
             } else {
                 showAlert("Failed to submit feedback. Try again.");
             }
@@ -421,6 +472,13 @@ public class PatientDashboardController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private String safeText(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return "Not provided";
+        }
+        return value.trim();
     }
 
     public static class CaregiverRow {

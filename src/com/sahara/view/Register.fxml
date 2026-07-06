@@ -7,15 +7,17 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.ScrollPane?>
 
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.sahara.controller.RegisterController"
-            fitToWidth="true" prefWidth="400.0" prefHeight="600.0">
+            fitToWidth="true" prefWidth="400.0" prefHeight="650.0">
 
-    <VBox alignment="CENTER" spacing="10.0">
+    <VBox alignment="CENTER" spacing="8.0">
         <padding>
             <Insets top="30.0" right="40.0" bottom="30.0" left="40.0"/>
         </padding>
@@ -27,27 +29,49 @@
 
         <Label text="Full Name" style="-fx-font-weight: bold;" maxWidth="Infinity"/>
         <TextField fx:id="nameField" promptText="Full name"/>
+        <Label fx:id="nameErrorLabel" textFill="RED" wrapText="true" maxWidth="Infinity" style="-fx-font-size: 11px;"/>
 
         <Label text="Email" style="-fx-font-weight: bold;" maxWidth="Infinity"/>
         <TextField fx:id="emailField" promptText="you@example.com"/>
+        <Label fx:id="emailErrorLabel" textFill="RED" wrapText="true" maxWidth="Infinity" style="-fx-font-size: 11px;"/>
 
         <Label text="Phone" style="-fx-font-weight: bold;" maxWidth="Infinity"/>
         <TextField fx:id="phoneField" promptText="98XXXXXXXX"/>
+        <Label fx:id="phoneErrorLabel" textFill="RED" wrapText="true" maxWidth="Infinity" style="-fx-font-size: 11px;"/>
 
         <Label text="Gender" style="-fx-font-weight: bold;" maxWidth="Infinity"/>
         <ComboBox fx:id="genderBox" maxWidth="Infinity"/>
 
         <Label text="Age" style="-fx-font-weight: bold;" maxWidth="Infinity"/>
         <TextField fx:id="ageField" promptText="e.g. 28"/>
+        <Label fx:id="ageErrorLabel" textFill="RED" wrapText="true" maxWidth="Infinity" style="-fx-font-size: 11px;"/>
 
         <Label text="Address" style="-fx-font-weight: bold;" maxWidth="Infinity"/>
         <TextField fx:id="addressField" promptText="City / area"/>
 
         <Label text="Password" style="-fx-font-weight: bold;" maxWidth="Infinity"/>
-        <PasswordField fx:id="passwordField" promptText="At least 6 characters"/>
+        <HBox spacing="6" alignment="CENTER_LEFT">
+            <StackPane HBox.hgrow="ALWAYS">
+                <PasswordField fx:id="passwordField" promptText="At least 6 characters" maxWidth="Infinity"/>
+                <TextField fx:id="passwordVisibleField" promptText="At least 6 characters" maxWidth="Infinity"
+                           managed="false" visible="false"/>
+            </StackPane>
+            <Button fx:id="togglePasswordBtn" text="👁" onAction="#handleTogglePassword"
+                    style="-fx-padding: 4 10 4 10;"/>
+        </HBox>
+        <Label fx:id="passwordErrorLabel" textFill="RED" wrapText="true" maxWidth="Infinity" style="-fx-font-size: 11px;"/>
 
         <Label text="Confirm Password" style="-fx-font-weight: bold;" maxWidth="Infinity"/>
-        <PasswordField fx:id="confirmPasswordField" promptText="Re-enter password"/>
+        <HBox spacing="6" alignment="CENTER_LEFT">
+            <StackPane HBox.hgrow="ALWAYS">
+                <PasswordField fx:id="confirmPasswordField" promptText="Re-enter password" maxWidth="Infinity"/>
+                <TextField fx:id="confirmPasswordVisibleField" promptText="Re-enter password" maxWidth="Infinity"
+                           managed="false" visible="false"/>
+            </StackPane>
+            <Button fx:id="toggleConfirmPasswordBtn" text="👁" onAction="#handleToggleConfirmPassword"
+                    style="-fx-padding: 4 10 4 10;"/>
+        </HBox>
+        <Label fx:id="confirmPasswordErrorLabel" textFill="RED" wrapText="true" maxWidth="Infinity" style="-fx-font-size: 11px;"/>
 
         <Label fx:id="messageLabel" wrapText="true" textFill="RED" maxWidth="Infinity"/>
 

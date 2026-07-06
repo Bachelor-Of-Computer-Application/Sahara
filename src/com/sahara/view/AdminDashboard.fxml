@@ -3,24 +3,181 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.sahara.controller.DashboardController"
-      alignment="CENTER" spacing="14.0" prefWidth="420.0" prefHeight="320.0">
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.sahara.controller.AdminDashboardController"
+            prefWidth="1100.0" prefHeight="700.0">
 
-    <padding>
-        <Insets top="40.0" right="40.0" bottom="40.0" left="40.0"/>
-    </padding>
+    <!-- Top bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="16"
+              style="-fx-background-color: #1A5276; -fx-padding: 14 24 14 24;">
+            <Label text="Sahara"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Label text="|" style="-fx-text-fill: #5D8AA8; -fx-font-size: 18px;"/>
+            <Label text="Admin Dashboard"
+                   style="-fx-font-size: 14px; -fx-text-fill: #AED6F1;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="welcomeLabel"
+                   style="-fx-font-size: 13px; -fx-text-fill: white;"/>
+            <Button text="Log Out" onAction="#handleLogout"
+                    style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 16 6 16; -fx-background-radius: 4;"/>
+        </HBox>
+    </top>
 
-    <Label text="Admin Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-    <Label fx:id="welcomeLabel" style="-fx-font-size: 16px;"/>
-    <Label fx:id="roleLabel" style="-fx-text-fill: #666666;"/>
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
 
-    <Label text="Coming soon: verify caregivers, manage care tiers and hospitals."
-           wrapText="true" textFill="#888888" maxWidth="Infinity"/>
+            <!-- STATISTICS TAB -->
+            <Tab text="Statistics">
+                <VBox spacing="20"
+                      style="-fx-background-color: #F4F6F9; -fx-padding: 24 24 24 24;">
+                    <Label text="System Overview"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                    <HBox spacing="20">
+                        <VBox spacing="8" alignment="CENTER"
+                              style="-fx-background-color: white; -fx-padding: 24; -fx-background-radius: 8; -fx-border-color: #D5D8DC; -fx-border-radius: 8; -fx-pref-width: 200;">
+                            <Label text="Total Patients"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #5D6D7E;"/>
+                            <Label fx:id="totalPatientsLabel" text="0"
+                                   style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                        </VBox>
+                        <VBox spacing="8" alignment="CENTER"
+                              style="-fx-background-color: white; -fx-padding: 24; -fx-background-radius: 8; -fx-border-color: #D5D8DC; -fx-border-radius: 8; -fx-pref-width: 200;">
+                            <Label text="Total Caregivers"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #5D6D7E;"/>
+                            <Label fx:id="totalCaregiversLabel" text="0"
+                                   style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                        </VBox>
+                        <VBox spacing="8" alignment="CENTER"
+                              style="-fx-background-color: white; -fx-padding: 24; -fx-background-radius: 8; -fx-border-color: #D5D8DC; -fx-border-radius: 8; -fx-pref-width: 200;">
+                            <Label text="Total Bookings"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #5D6D7E;"/>
+                            <Label fx:id="totalBookingsLabel" text="0"
+                                   style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                        </VBox>
+                    </HBox>
+                    <HBox>
+                        <Button text="Refresh" onAction="#handleRefreshStatistics"
+                                style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                    </HBox>
+                </VBox>
+            </Tab>
 
-    <Button text="Log Out" onAction="#handleLogout" maxWidth="Infinity"
-            style="-fx-padding: 8 0 8 0;"/>
-</VBox>
+            <!-- CAREGIVERS TAB -->
+            <Tab text="Caregivers">
+                <VBox spacing="14"
+                      style="-fx-background-color: #F4F6F9; -fx-padding: 16 20 16 20;">
+                    <Label text="Caregiver Verification"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                    <HBox spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 6;">
+                        <Button text="Verify Caregiver" onAction="#handleVerifyCaregiver"
+                                style="-fx-background-color: #1E8449; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Button text="Reject Caregiver" onAction="#handleRejectCaregiver"
+                                style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Refresh" onAction="#handleRefreshCaregivers"
+                                style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                    </HBox>
+                    <TableView fx:id="caregiverTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="cgNameCol" text="Full Name" prefWidth="180"/>
+                            <TableColumn fx:id="cgGenderCol" text="Gender" prefWidth="80"/>
+                            <TableColumn fx:id="cgAgeCol" text="Age" prefWidth="60"/>
+                            <TableColumn fx:id="cgExperienceCol" text="Experience (yrs)" prefWidth="130"/>
+                            <TableColumn fx:id="cgVerifiedCol" text="Verified" prefWidth="90"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No caregivers found."/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <!-- BOOKINGS TAB -->
+            <Tab text="Bookings">
+                <VBox spacing="14"
+                      style="-fx-background-color: #F4F6F9; -fx-padding: 16 20 16 20;">
+                    <Label text="All Bookings"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                    <HBox spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 6;">
+                        <Button text="Mark as Active" onAction="#handleMarkActive"
+                                style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Button text="Mark as Completed" onAction="#handleMarkCompleted"
+                                style="-fx-background-color: #1E8449; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Refresh" onAction="#handleRefreshBookings"
+                                style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                    </HBox>
+                    <TableView fx:id="bookingTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="bkPatientCol" text="Patient" prefWidth="150"/>
+                            <TableColumn fx:id="bkCaregiverCol" text="Caregiver" prefWidth="150"/>
+                            <TableColumn fx:id="bkHospitalCol" text="Hospital" prefWidth="150"/>
+                            <TableColumn fx:id="bkWardCol" text="Ward" prefWidth="90"/>
+                            <TableColumn fx:id="bkStatusCol" text="Status" prefWidth="100"/>
+                            <TableColumn fx:id="bkCostCol" text="Cost (NPR)" prefWidth="100"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No bookings found."/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <!-- HOSPITALS TAB -->
+            <Tab text="Hospitals">
+                <VBox spacing="14"
+                      style="-fx-background-color: #F4F6F9; -fx-padding: 16 20 16 20;">
+                    <Label text="Manage Hospitals"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                    <TableView fx:id="hospitalTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="hpNameCol" text="Name" prefWidth="220"/>
+                            <TableColumn fx:id="hpAddressCol" text="Address" prefWidth="280"/>
+                            <TableColumn fx:id="hpCityCol" text="City" prefWidth="160"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No hospitals found."/>
+                        </placeholder>
+                    </TableView>
+                    <HBox spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 6;">
+                        <Button text="Delete Selected" onAction="#handleDeleteHospital"
+                                style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Refresh" onAction="#handleRefreshHospitals"
+                                style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                    </HBox>
+                    <Label text="Add New Hospital"
+                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                    <HBox spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 6;">
+                        <Label text="Name:" style="-fx-font-weight: bold;"/>
+                        <TextField fx:id="hospitalNameField" promptText="Hospital name" prefWidth="200"/>
+                        <Label text="Address:" style="-fx-font-weight: bold;"/>
+                        <TextField fx:id="hospitalAddressField" promptText="Street address" prefWidth="200"/>
+                        <Label text="City:" style="-fx-font-weight: bold;"/>
+                        <TextField fx:id="hospitalCityField" promptText="City" prefWidth="140"/>
+                        <Button text="Add Hospital" onAction="#handleAddHospital"
+                                style="-fx-background-color: #1E8449; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+        </TabPane>
+    </center>
+
+</BorderPane>

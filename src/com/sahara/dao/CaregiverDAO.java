@@ -1,6 +1,7 @@
 package com.sahara.dao;
 
 import com.sahara.model.Caregiver;
+import com.sahara.model.CaregiverView;
 import com.sahara.util.DBConnection;
 
 import java.sql.*;
@@ -13,9 +14,6 @@ public class CaregiverDAO {
         return DBConnection.getConnection();
     }
 
-    // ─────────────────────────────────────────────
-    // CREATE — Insert a new caregiver
-    // ─────────────────────────────────────────────
     public boolean createCaregiver(Caregiver caregiver) {
         String sql = "INSERT INTO caregivers (user_id, gender, age, address, " +
                 "experience_years, bio, is_verified, avg_rating) " +
@@ -28,20 +26,15 @@ public class CaregiverDAO {
             stmt.setString(4, caregiver.getAddress());
             stmt.setInt(5, caregiver.getExperienceYears());
             stmt.setString(6, caregiver.getBio());
-            stmt.setBoolean(7, false); // always false on registration
-            stmt.setDouble(8, 0.00);  // always 0 on registration
-
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+            stmt.setBoolean(7, false);
+            stmt.setDouble(8, 0.00);
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Error creating caregiver: " + e.getMessage());
         }
         return false;
     }
 
-    // ─────────────────────────────────────────────
-    // READ — Get caregiver by caregiver_id
-    // ─────────────────────────────────────────────
     public Caregiver getCaregiverById(int caregiverId) {
         String sql = "SELECT * FROM caregivers WHERE caregiver_id = ?";
         try {
@@ -57,10 +50,6 @@ public class CaregiverDAO {
         return null;
     }
 
-    // ─────────────────────────────────────────────
-    // READ — Get caregiver by user_id
-    // (used right after caregiver logs in)
-    // ─────────────────────────────────────────────
     public Caregiver getCaregiverByUserId(int userId) {
         String sql = "SELECT * FROM caregivers WHERE user_id = ?";
         try {
@@ -76,9 +65,6 @@ public class CaregiverDAO {
         return null;
     }
 
-    // ─────────────────────────────────────────────
-    // READ — Get all caregivers (for admin panel)
-    // ─────────────────────────────────────────────
     public List<Caregiver> getAllCaregivers() {
         List<Caregiver> caregivers = new ArrayList<>();
         String sql = "SELECT * FROM caregivers";
@@ -94,10 +80,6 @@ public class CaregiverDAO {
         return caregivers;
     }
 
-    // ─────────────────────────────────────────────
-    // READ — Get only verified caregivers
-    // (for patient browsing screen)
-    // ─────────────────────────────────────────────
     public List<Caregiver> getVerifiedCaregivers() {
         List<Caregiver> caregivers = new ArrayList<>();
         String sql = "SELECT * FROM caregivers WHERE is_verified = true";
@@ -113,9 +95,6 @@ public class CaregiverDAO {
         return caregivers;
     }
 
-    // ─────────────────────────────────────────────
-    // UPDATE — Update caregiver profile details
-    // ─────────────────────────────────────────────
     public boolean updateCaregiver(Caregiver caregiver) {
         String sql = "UPDATE caregivers SET gender=?, age=?, address=?, " +
                 "experience_years=?, bio=? " +
@@ -128,52 +107,55 @@ public class CaregiverDAO {
             stmt.setInt(4, caregiver.getExperienceYears());
             stmt.setString(5, caregiver.getBio());
             stmt.setInt(6, caregiver.getCaregiverId());
-
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Error updating caregiver: " + e.getMessage());
         }
         return false;
     }
 
-    // ─────────────────────────────────────────────
-    // UPDATE — Verify a caregiver (admin action)
-    // Sets is_verified = true
-    // ─────────────────────────────────────────────
     public boolean verifyCaregiver(int caregiverId) {
-        String sql = "UPDATE caregivers SET is_verified = true " +
-                "WHERE caregiver_id = ?";
+        String sql = "UPDATE caregivers SET is_verified = true WHERE caregiver_id = ?";
         try {
             PreparedStatement stmt = getConnection().prepareStatement(sql);
             stmt.setInt(1, caregiverId);
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Error verifying caregiver: " + e.getMessage());
         }
         return false;
     }
 
-    // ─────────────────────────────────────────────
-    // DELETE — Delete caregiver by caregiver_id
-    // ─────────────────────────────────────────────
     public boolean deleteCaregiver(int caregiverId) {
         String sql = "DELETE FROM caregivers WHERE caregiver_id = ?";
         try {
             PreparedStatement stmt = getConnection().prepareStatement(sql);
             stmt.setInt(1, caregiverId);
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Error deleting caregiver: " + e.getMessage());
         }
         return false;
     }
 
-    // ─────────────────────────────────────────────
-    // HELPER — Convert ResultSet row to Caregiver object
-    // ─────────────────────────────────────────────
+    public List<CaregiverView> getAllCaregiversWithNames() {
+        List<CaregiverView> list = new ArrayList<>();
+        String sql = "SELECT c.*, u.full_name FROM caregivers c " +
+                "JOIN users u ON c.user_id = u.user_id";
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Caregiver c = extractCaregiver(rs);
+                String fullName = rs.getString("full_name");
+                list.add(new CaregiverView(c, fullName));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting caregivers with names: " + e.getMessage());
+        }
+        return list;
+    }
+
     private Caregiver extractCaregiver(ResultSet rs) throws SQLException {
         Caregiver caregiver = new Caregiver();
         caregiver.setCaregiverId(rs.getInt("caregiver_id"));

@@ -147,7 +147,7 @@ public class PatientDashboardController {
             bookings = bookingDAO.getBookingsByPatientId(
                     patient.getPatientId());
         } else {
-            bookings = bookingDAO.getBookingsByPatientIdAndStatus(
+            bookings = bookingDAO   .getBookingsByPatientIdAndStatus(
                     patient.getPatientId(), selectedStatus);
         }
 

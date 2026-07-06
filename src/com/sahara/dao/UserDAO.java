@@ -175,4 +175,20 @@ public class UserDAO {
         }
         return user;
     }
+    // ─────────────────────────────────────────────
+    // UPDATE — Reset just the password (used by "Forgot Password")
+    // ─────────────────────────────────────────────
+    public boolean updatePassword(int userId, String newPasswordHash) {
+        String sql = "UPDATE users SET password_hash=? WHERE user_id=?";
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement(sql);
+            stmt.setString(1, newPasswordHash);
+            stmt.setInt(2, userId);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating password: " + e.getMessage());
+        }
+        return false;
+    }
 }

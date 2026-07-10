@@ -21,8 +21,7 @@ public class BookingDAO {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try {
             PreparedStatement stmt = getConnection().prepareStatement(
-                    sql, Statement.RETURN_GENERATED_KEYS
-            );
+                    sql, Statement.RETURN_GENERATED_KEYS);
             stmt.setInt(1, booking.getPatientId());
             stmt.setInt(2, booking.getCaregiverId());
             stmt.setInt(3, booking.getTierId());
@@ -36,9 +35,7 @@ public class BookingDAO {
             stmt.setString(11, booking.getNotes());
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
-            if (keys.next()) {
-                return keys.getInt(1);
-            }
+            if (keys.next()) return keys.getInt(1);
         } catch (SQLException e) {
             System.out.println("Error creating booking: " + e.getMessage());
         }
@@ -51,9 +48,7 @@ public class BookingDAO {
             PreparedStatement stmt = getConnection().prepareStatement(sql);
             stmt.setInt(1, bookingId);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return extractBooking(rs);
-            }
+            if (rs.next()) return extractBooking(rs);
         } catch (SQLException e) {
             System.out.println("Error getting booking: " + e.getMessage());
         }
@@ -67,9 +62,7 @@ public class BookingDAO {
             PreparedStatement stmt = getConnection().prepareStatement(sql);
             stmt.setInt(1, patientId);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                bookings.add(extractBooking(rs));
-            }
+            while (rs.next()) bookings.add(extractBooking(rs));
         } catch (SQLException e) {
             System.out.println("Error getting patient bookings: " + e.getMessage());
         }
@@ -83,21 +76,13 @@ public class BookingDAO {
             PreparedStatement stmt = getConnection().prepareStatement(sql);
             stmt.setInt(1, caregiverId);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                bookings.add(extractBooking(rs));
-            }
+            while (rs.next()) bookings.add(extractBooking(rs));
         } catch (SQLException e) {
             System.out.println("Error getting caregiver bookings: " + e.getMessage());
         }
         return bookings;
     }
 
-<<<<<<< HEAD
-=======
-    // ─────────────────────────────────────────────
-    // READ — Get bookings for a caregiver filtered by status
-    // (NEW: used by the Caregiver Dashboard's Requests/Active/Completed tabs)
-    // ─────────────────────────────────────────────
     public List<Booking> getBookingsByCaregiverIdAndStatus(int caregiverId, String status) {
         List<Booking> bookings = new ArrayList<>();
         String sql = "SELECT * FROM bookings WHERE caregiver_id = ? AND status = ?";
@@ -106,28 +91,35 @@ public class BookingDAO {
             stmt.setInt(1, caregiverId);
             stmt.setString(2, status);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                bookings.add(extractBooking(rs));
-            }
+            while (rs.next()) bookings.add(extractBooking(rs));
         } catch (SQLException e) {
-            System.out.println("Error getting caregiver bookings by status: " + e.getMessage());
+            System.out.println("Error getting bookings by caregiver and status: " + e.getMessage());
         }
         return bookings;
     }
 
-    // ─────────────────────────────────────────────
-    // READ — Get all bookings (admin panel)
-    // ─────────────────────────────────────────────
->>>>>>> 0db93c83d672d1acc76e430a5f4746594cfc4b69
+    public List<Booking> getBookingsByPatientIdAndStatus(int patientId, String status) {
+        List<Booking> bookings = new ArrayList<>();
+        String sql = "SELECT * FROM bookings WHERE patient_id = ? AND status = ?";
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement(sql);
+            stmt.setInt(1, patientId);
+            stmt.setString(2, status);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) bookings.add(extractBooking(rs));
+        } catch (SQLException e) {
+            System.out.println("Error getting bookings by patient and status: " + e.getMessage());
+        }
+        return bookings;
+    }
+
     public List<Booking> getAllBookings() {
         List<Booking> bookings = new ArrayList<>();
         String sql = "SELECT * FROM bookings";
         try {
             PreparedStatement stmt = getConnection().prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                bookings.add(extractBooking(rs));
-            }
+            while (rs.next()) bookings.add(extractBooking(rs));
         } catch (SQLException e) {
             System.out.println("Error getting all bookings: " + e.getMessage());
         }
@@ -141,9 +133,7 @@ public class BookingDAO {
             PreparedStatement stmt = getConnection().prepareStatement(sql);
             stmt.setString(1, status);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                bookings.add(extractBooking(rs));
-            }
+            while (rs.next()) bookings.add(extractBooking(rs));
         } catch (SQLException e) {
             System.out.println("Error getting bookings by status: " + e.getMessage());
         }
@@ -183,7 +173,6 @@ public class BookingDAO {
         return false;
     }
 
-<<<<<<< HEAD
     public List<BookingView> getAllBookingsWithNames() {
         List<BookingView> list = new ArrayList<>();
         String sql = "SELECT b.*, " +
@@ -204,7 +193,8 @@ public class BookingDAO {
                 String patientName   = rs.getString("patient_name");
                 String caregiverName = rs.getString("caregiver_name");
                 String hospitalName  = rs.getString("hospital_name");
-                list.add(new BookingView(booking, patientName, caregiverName, hospitalName));
+                list.add(new BookingView(booking, patientName,
+                        caregiverName, hospitalName));
             }
         } catch (SQLException e) {
             System.out.println("Error getting bookings with names: " + e.getMessage());
@@ -212,31 +202,6 @@ public class BookingDAO {
         return list;
     }
 
-=======
-    // ─────────────────────────────────────────────
-    // HELPER — Convert ResultSet row to Booking object
-    // ─────────────────────────────────────────────
-// ─────────────────────────────────────────────
-    // READ — Get bookings for a patient filtered by status
-    // (used by "Filter bookings by status" on Patient Dashboard)
-    // ─────────────────────────────────────────────
-    public List<Booking> getBookingsByPatientIdAndStatus(int patientId, String status) {
-        List<Booking> bookings = new ArrayList<>();
-        String sql = "SELECT * FROM bookings WHERE patient_id = ? AND status = ?";
-        try {
-            PreparedStatement stmt = getConnection().prepareStatement(sql);
-            stmt.setInt(1, patientId);
-            stmt.setString(2, status);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                bookings.add(extractBooking(rs));
-            }
-        } catch (SQLException e) {
-            System.out.println("Error getting patient bookings by status: " + e.getMessage());
-        }
-        return bookings;
-    }
->>>>>>> 0db93c83d672d1acc76e430a5f4746594cfc4b69
     private Booking extractBooking(ResultSet rs) throws SQLException {
         Booking booking = new Booking();
         booking.setBookingId(rs.getInt("booking_id"));

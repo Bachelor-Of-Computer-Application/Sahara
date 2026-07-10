@@ -8,11 +8,9 @@ public class DBConnection {
 
     private static final String URL      = "jdbc:mysql://localhost:3306/sahara_db";
     private static final String USER     = "root";
-<<<<<<< HEAD
+
     private static final String PASSWORD = "yeppogirl";
-=======
-    private static final String PASSWORD = "Alynaa@7.";
->>>>>>> 0db93c83d672d1acc76e430a5f4746594cfc4b69
+
 
     private static Connection connection = null;
 

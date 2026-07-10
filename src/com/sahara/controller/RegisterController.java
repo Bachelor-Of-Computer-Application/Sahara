@@ -169,5 +169,6 @@ public class RegisterController {
     @FXML
     private void goToLogin(ActionEvent event) {
         SceneManager.switchScene("/com/sahara/view/Login.fxml", "Login");
+
     }
 }

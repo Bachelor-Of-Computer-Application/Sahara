@@ -4,6 +4,7 @@ import com.sahara.dao.*;
 import com.sahara.model.*;
 import com.sahara.util.SceneManager;
 import com.sahara.util.SessionManager;
+import com.sahara.util.PasswordUtil;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -17,15 +18,11 @@ import javafx.scene.control.*;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Controller for CaregiverDashboard.fxml — the full 5-tab caregiver home
- * screen: Booking Requests, Active Assignments, Completed History,
- * Availability, and My Profile.
- */
 public class CaregiverDashboardController {
 
     // ── Header ──────────────────────────────────────────
     @FXML private Label welcomeLabel;
+    @FXML private Button notificationBellBtn;
 
     // ── Tab 1: Booking Requests ────────────────────────
     @FXML private TableView<BookingRow> requestsTable;
@@ -69,6 +66,11 @@ public class CaregiverDashboardController {
     @FXML private TextArea  profileBioArea;
     @FXML private ListView<String> feedbackListView;
 
+    @FXML private PasswordField currentPasswordField;
+    @FXML private PasswordField newPasswordField;
+    @FXML private PasswordField confirmNewPasswordField;
+    @FXML private Label passwordChangeErrorLabel;
+
     // ── DAOs ────────────────────────────────────────────
     private final CaregiverDAO    caregiverDAO    = new CaregiverDAO();
     private final BookingDAO      bookingDAO      = new BookingDAO();
@@ -78,6 +80,7 @@ public class CaregiverDashboardController {
     private final NotificationDAO notificationDAO = new NotificationDAO();
     private final AvailabilityDAO availabilityDAO = new AvailabilityDAO();
     private final FeedbackDAO     feedbackDAO     = new FeedbackDAO();
+    private final CareTierDAO     careTierDAO     = new CareTierDAO();
 
     private Caregiver caregiver;
     private int caregiverId = -1;
@@ -103,6 +106,7 @@ public class CaregiverDashboardController {
         loadCompleted();
         loadAvailability();
         loadProfile();
+        refreshNotificationBadge();
     }
 
     // ══════════════════════════════════════════════════
@@ -129,15 +133,24 @@ public class CaregiverDashboardController {
             showAlert("Please select a booking request first!");
             return;
         }
-        boolean updated = bookingDAO.updateBookingStatus(selected.bookingId, "CONFIRMED");
-        if (updated) {
-            notifyPatient(selected.bookingId, "Your booking #" + selected.bookingId +
-                    " has been accepted by the caregiver.");
-            showAlert("Booking #" + selected.bookingId + " accepted.");
-            loadRequests();
-        } else {
-            showAlert("Failed to accept booking. Try again.");
-        }
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Accept Request");
+        confirm.setHeaderText("Accept Booking #" + selected.bookingId + "?");
+        confirm.setContentText("You're agreeing to care for " + selected.patientName +
+                " at " + selected.hospitalName + ".");
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                boolean updated = bookingDAO.updateBookingStatus(selected.bookingId, "CONFIRMED");
+                if (updated) {
+                    notifyPatient(selected.bookingId, "Your booking #" + selected.bookingId +
+                            " has been accepted by the caregiver.");
+                    showAlert("Booking #" + selected.bookingId + " accepted.");
+                    loadRequests();
+                } else {
+                    showAlert("Failed to accept booking. Try again.");
+                }
+            }
+        });
     }
 
     @FXML
@@ -171,6 +184,11 @@ public class CaregiverDashboardController {
         loadRequests();
     }
 
+    @FXML
+    private void handleViewRequestDetails(ActionEvent event) {
+        showBookingDetails(requestsTable.getSelectionModel().getSelectedItem());
+    }
+
     // ══════════════════════════════════════════════════
     //  TAB 2 — ACTIVE ASSIGNMENTS  (status = ACTIVE)
     // ══════════════════════════════════════════════════
@@ -193,6 +211,11 @@ public class CaregiverDashboardController {
         loadActive();
     }
 
+    @FXML
+    private void handleViewActiveDetails(ActionEvent event) {
+        showBookingDetails(activeTable.getSelectionModel().getSelectedItem());
+    }
+
     // ══════════════════════════════════════════════════
     //  TAB 3 — COMPLETED HISTORY  (status = COMPLETED)
     // ══════════════════════════════════════════════════
@@ -213,6 +236,47 @@ public class CaregiverDashboardController {
     @FXML
     private void handleRefreshCompleted(ActionEvent event) {
         loadCompleted();
+    }
+
+    @FXML
+    private void handleViewCompletedDetails(ActionEvent event) {
+        showBookingDetails(completedTable.getSelectionModel().getSelectedItem());
+    }
+
+    // ── Shared popup used by all 3 booking tabs' "View Details" button ──
+    private void showBookingDetails(BookingRow row) {
+        if (row == null) {
+            showAlert("Please select a booking first!");
+            return;
+        }
+        Booking booking = bookingDAO.getBookingById(row.bookingId);
+        if (booking == null) {
+            showAlert("Could not load booking details.");
+            return;
+        }
+
+        CareTier tier = careTierDAO.getTierById(booking.getTierId());
+        String tierName = (tier != null) ? tier.getTierName() : "Unknown";
+
+        String notes = (booking.getNotes() != null && !booking.getNotes().isBlank())
+                ? booking.getNotes() : "(none)";
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Booking Details");
+        alert.setHeaderText("Booking #" + booking.getBookingId());
+        alert.setContentText(
+                "Patient       : " + row.patientName + "\n" +
+                "Hospital      : " + row.hospitalName + "\n" +
+                "Ward          : " + booking.getWard() + "\n" +
+                "Care Tier     : " + tierName + "\n" +
+                "Admission     : " + booking.getAdmissionDate() + "\n" +
+                "Discharge     : " + booking.getDischargeDate() + "\n" +
+                "Total Days    : " + booking.getTotalDays() + "\n" +
+                "Total Cost    : NPR " + booking.getTotalCost() + "\n" +
+                "Status        : " + booking.getStatus() + "\n" +
+                "Notes         : " + notes
+        );
+        alert.showAndWait();
     }
 
     // ── Shared helper used by all 3 booking tabs above ──
@@ -272,10 +336,29 @@ public class CaregiverDashboardController {
             rows.add(new AvailabilityRow(
                     a.getAvailabilityId(),
                     a.getAvailableDate().toString(),
-                    a.isAvailable() ? "Available" : "Unavailable"
+                    a.isAvailable() ? "Available" : "Unavailable",
+                    a.isAvailable()
             ));
         }
         availabilityTable.setItems(rows);
+    }
+
+    // ── UPDATE — toggle a date between Available / Unavailable ──
+    @FXML
+    private void handleToggleAvailability(ActionEvent event) {
+        AvailabilityRow selected = availabilityTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert("Please select a date first!");
+            return;
+        }
+        boolean newStatus = !selected.isAvailable; // flip it
+        boolean updated = availabilityDAO.updateAvailability(selected.availabilityId, newStatus);
+        if (updated) {
+            showAlert(selected.date + " is now marked " + (newStatus ? "Available" : "Unavailable") + ".");
+            loadAvailability();
+        } else {
+            showAlert("Failed to update. Try again.");
+        }
     }
 
     @FXML
@@ -375,6 +458,91 @@ public class CaregiverDashboardController {
         }
     }
 
+    // ── Change Password ───────────────────────────
+    @FXML
+    private void handleChangePassword(ActionEvent event) {
+        passwordChangeErrorLabel.setText("");
+
+        String currentPassword = currentPasswordField.getText();
+        String newPassword = newPasswordField.getText();
+        String confirmPassword = confirmNewPasswordField.getText();
+
+        if (currentPassword == null || currentPassword.isEmpty()) {
+            passwordChangeErrorLabel.setText("Enter your current password.");
+            return;
+        }
+
+        User user = userDAO.getUserById(SessionManager.getUserId());
+        if (user == null || !PasswordUtil.verifyPassword(currentPassword, user.getPasswordHash())) {
+            passwordChangeErrorLabel.setText("Current password is incorrect.");
+            return;
+        }
+
+        if (newPassword == null || newPassword.length() < 6) {
+            passwordChangeErrorLabel.setText("New password must be at least 6 characters.");
+            return;
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            passwordChangeErrorLabel.setText("New passwords do not match.");
+            return;
+        }
+
+        String newHash = PasswordUtil.hashPassword(newPassword);
+        boolean updated = userDAO.updatePassword(user.getUserId(), newHash);
+
+        if (updated) {
+            currentPasswordField.clear();
+            newPasswordField.clear();
+            confirmNewPasswordField.clear();
+            showAlert("Password changed successfully!");
+        } else {
+            passwordChangeErrorLabel.setText("Something went wrong. Please try again.");
+        }
+    }
+
+    // ══════════════════════════════════════════════════
+    //  NOTIFICATIONS
+    // ══════════════════════════════════════════════════
+
+    private void refreshNotificationBadge() {
+        int unread = notificationDAO.getUnreadCount(SessionManager.getUserId());
+        notificationBellBtn.setText(unread > 0 ? "🔔 (" + unread + ")" : "🔔");
+    }
+
+    @FXML
+    private void handleNotifications(ActionEvent event) {
+        int userId = SessionManager.getUserId();
+        List<Notification> notifications = notificationDAO.getNotificationsByUserId(userId);
+
+        ListView<String> list = new ListView<>();
+        ObservableList<String> items = FXCollections.observableArrayList();
+        if (notifications.isEmpty()) {
+            items.add("You have no notifications yet.");
+        } else {
+            for (Notification n : notifications) {
+                String prefix = n.isRead() ? "⚪" : "🔴";
+                items.add(prefix + "  " + n.getMessage());
+            }
+        }
+        list.setItems(items);
+        list.setPrefSize(380, 300);
+
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Notifications");
+        dialog.setHeaderText("🔴 = unread   ⚪ = read");
+        dialog.getDialogPane().setContent(list);
+
+        ButtonType markAllBtn = new ButtonType("Mark All as Read", ButtonBar.ButtonData.OTHER);
+        dialog.getDialogPane().getButtonTypes().addAll(markAllBtn, ButtonType.CLOSE);
+
+        Button markAllButtonNode = (Button) dialog.getDialogPane().lookupButton(markAllBtn);
+        markAllButtonNode.setOnAction(e -> notificationDAO.markAllAsRead(userId));
+
+        dialog.showAndWait();
+        refreshNotificationBadge();
+    }
+
     // ══════════════════════════════════════════════════
     //  LOGOUT
     // ══════════════════════════════════════════════════
@@ -413,11 +581,13 @@ public class CaregiverDashboardController {
     public static class AvailabilityRow {
         int availabilityId;
         String date, status;
+        boolean isAvailable;
 
-        AvailabilityRow(int id, String date, String status) {
+        AvailabilityRow(int id, String date, String status, boolean isAvailable) {
             this.availabilityId = id;
-            this.date   = date;
-            this.status = status;
+            this.date        = date;
+            this.status       = status;
+            this.isAvailable  = isAvailable;
         }
     }
 }

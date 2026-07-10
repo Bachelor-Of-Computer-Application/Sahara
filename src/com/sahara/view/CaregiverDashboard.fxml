@@ -5,6 +5,7 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -33,6 +34,8 @@
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="welcomeLabel"
                    style="-fx-font-size: 13px; -fx-text-fill: white;"/>
+            <Button fx:id="notificationBellBtn" text="🔔" onAction="#handleNotifications"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 18px; -fx-padding: 4 10 4 10; -fx-cursor: hand;"/>
             <Button text="Log Out" onAction="#handleLogout"
                     style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 16 6 16; -fx-background-radius: 4;"/>
         </HBox>
@@ -41,7 +44,6 @@
     <center>
         <TabPane tabClosingPolicy="UNAVAILABLE">
 
-            <!-- ══════════ TAB 1: BOOKING REQUESTS ══════════ -->
             <Tab text="Booking Requests">
                 <VBox spacing="14" style="-fx-background-color: #F4F6F9; -fx-padding: 16 20 16 20;">
                     <Label text="Incoming Booking Requests"
@@ -50,6 +52,8 @@
                           style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 6;">
                         <Button text="Refresh" onAction="#handleRefreshRequests"
                                 style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Button text="View Details" onAction="#handleViewRequestDetails"
+                                style="-fx-background-color: #5D6D7E; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
                         <Region HBox.hgrow="ALWAYS"/>
                         <Button text="Accept" onAction="#handleAccept"
                                 style="-fx-background-color: #1E8449; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
@@ -72,7 +76,6 @@
                 </VBox>
             </Tab>
 
-            <!-- ══════════ TAB 2: ACTIVE ASSIGNMENTS ══════════ -->
             <Tab text="Active Assignments">
                 <VBox spacing="14" style="-fx-background-color: #F4F6F9; -fx-padding: 16 20 16 20;">
                     <Label text="Your Active Assignments"
@@ -81,6 +84,8 @@
                           style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 6;">
                         <Button text="Refresh" onAction="#handleRefreshActive"
                                 style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Button text="View Details" onAction="#handleViewActiveDetails"
+                                style="-fx-background-color: #5D6D7E; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
                     </HBox>
                     <TableView fx:id="activeTable" VBox.vgrow="ALWAYS">
                         <columns>
@@ -98,7 +103,6 @@
                 </VBox>
             </Tab>
 
-            <!-- ══════════ TAB 3: COMPLETED HISTORY ══════════ -->
             <Tab text="Completed History">
                 <VBox spacing="14" style="-fx-background-color: #F4F6F9; -fx-padding: 16 20 16 20;">
                     <Label text="Completed Assignment History"
@@ -107,6 +111,8 @@
                           style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 6;">
                         <Button text="Refresh" onAction="#handleRefreshCompleted"
                                 style="-fx-background-color: #2E86C1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
+                        <Button text="View Details" onAction="#handleViewCompletedDetails"
+                                style="-fx-background-color: #5D6D7E; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
                     </HBox>
                     <TableView fx:id="completedTable" VBox.vgrow="ALWAYS">
                         <columns>
@@ -124,7 +130,6 @@
                 </VBox>
             </Tab>
 
-            <!-- ══════════ TAB 4: AVAILABILITY ══════════ -->
             <Tab text="Availability">
                 <VBox spacing="14" style="-fx-background-color: #F4F6F9; -fx-padding: 16 20 16 20;">
                     <Label text="Set Your Availability"
@@ -136,6 +141,8 @@
                         <Button text="Add Date" onAction="#handleAddAvailability"
                                 style="-fx-background-color: #1E8449; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
                         <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Toggle Status" onAction="#handleToggleAvailability"
+                                style="-fx-background-color: #8E44AD; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
                         <Button text="Remove Selected" onAction="#handleRemoveAvailability"
                                 style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 18 6 18; -fx-background-radius: 4;"/>
                         <Button text="Refresh" onAction="#handleRefreshAvailability"
@@ -153,7 +160,6 @@
                 </VBox>
             </Tab>
 
-            <!-- ══════════ TAB 5: MY PROFILE ══════════ -->
             <Tab text="My Profile">
                 <VBox spacing="18" style="-fx-background-color: #F4F6F9; -fx-padding: 20 24 20 24;">
                     <Label text="My Profile"
@@ -186,7 +192,28 @@
 
                     <Label text="Patient Feedback"
                            style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
-                    <ListView fx:id="feedbackListView" prefHeight="180" VBox.vgrow="ALWAYS"/>
+                    <ListView fx:id="feedbackListView" prefHeight="150" VBox.vgrow="ALWAYS"/>
+
+                    <Label text="Change Password"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+                    <GridPane hgap="12" vgap="12"
+                              style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 6;">
+                        <Label text="Current Password:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <PasswordField fx:id="currentPasswordField" prefWidth="220" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                        <Label text="New Password:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <PasswordField fx:id="newPasswordField" prefWidth="220" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                        <Label text="Confirm New Password:" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <PasswordField fx:id="confirmNewPasswordField" prefWidth="220" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                        <Label fx:id="passwordChangeErrorLabel" textFill="RED" wrapText="true" maxWidth="300"
+                               GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                        <Button text="Change Password" onAction="#handleChangePassword"
+                                style="-fx-background-color: #8E44AD; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20 8 20; -fx-background-radius: 4;"
+                                GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                    </GridPane>
                 </VBox>
             </Tab>
 

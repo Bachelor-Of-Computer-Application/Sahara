@@ -273,7 +273,10 @@ public class AdminDashboardController {
     // ─────────────────────────────────────────────
     // ADD MEMBER
     // ─────────────────────────────────────────────
-    private void setupMemberForm() {
+    // TODO (simran): implement this - refreshPatients() was called but never written
+    private void refreshPatients() {
+        // placeholder so the project compiles - fill in real logic later
+    }  private void setupMemberForm() {
         if (memberRoleCombo != null)
             memberRoleCombo.setItems(FXCollections.observableArrayList(
                     "PATIENT", "CAREGIVER", "ADMIN"));

@@ -7,49 +7,56 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx"
+<HBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.sahara.controller.LoginController"
-      alignment="CENTER" spacing="10.0" prefWidth="380.0" prefHeight="480.0">
+      prefWidth="820" prefHeight="520">
 
-    <padding>
-        <Insets top="40.0" right="40.0" bottom="40.0" left="40.0"/>
-    </padding>
+    <VBox alignment="CENTER" spacing="16" prefWidth="320" HBox.hgrow="NEVER"
+          style="-fx-background-color: linear-gradient(to bottom right, #1A5276, #2E86C1); -fx-padding: 40;">
+        <Label text="🏥" style="-fx-font-size: 46px;"/>
+        <Label text="Sahara" style="-fx-font-size: 34px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        <Label text="Hospital Caregiver Request System" wrapText="true" textAlignment="CENTER"
+               style="-fx-font-size: 13px; -fx-text-fill: #D6EAF8;"/>
+    </VBox>
 
-    <Label text="Sahara" style="-fx-font-size: 32px; -fx-font-weight: bold;"/>
-    <Label text="Hospital Caregiver Request System"
-           style="-fx-font-size: 13px; -fx-text-fill: #666666;"/>
+    <VBox alignment="CENTER" HBox.hgrow="ALWAYS" style="-fx-background-color: #F4F6F9;">
+        <VBox spacing="10" maxWidth="300" alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-padding: 36; -fx-background-radius: 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 20, 0, 0, 6);">
 
-    <Label text="Email" style="-fx-font-weight: bold;" maxWidth="Infinity"/>
-    <TextField fx:id="emailField" promptText="you@example.com"/>
-    <Label fx:id="emailErrorLabel" textFill="RED" wrapText="true" maxWidth="Infinity"
-           style="-fx-font-size: 11px;"/>
+            <Label text="Welcome back" style="-fx-font-size: 21px; -fx-font-weight: bold; -fx-text-fill: #1A5276;"/>
+            <Label text="Log in to continue" style="-fx-font-size: 12px; -fx-text-fill: #909497;"/>
+            <Region prefHeight="8"/>
 
-    <Label text="Password" style="-fx-font-weight: bold;" maxWidth="Infinity"/>
-    <HBox spacing="6" alignment="CENTER_LEFT">
-        <StackPane HBox.hgrow="ALWAYS">
-            <PasswordField fx:id="passwordField" promptText="Your password" maxWidth="Infinity"/>
-            <TextField fx:id="passwordVisibleField" promptText="Your password" maxWidth="Infinity"
-                       managed="false" visible="false"/>
-        </StackPane>
-        <Button fx:id="togglePasswordBtn" text="👁" onAction="#handleTogglePassword"
-                style="-fx-padding: 4 10 4 10;"/>
-    </HBox>
-    <Label fx:id="passwordErrorLabel" textFill="RED" wrapText="true" maxWidth="Infinity"
-           style="-fx-font-size: 11px;"/>
+            <Label text="Email" style="-fx-font-weight: bold; -fx-font-size: 12px;" maxWidth="Infinity"/>
+            <TextField fx:id="emailField" promptText="you@example.com"/>
+            <Label fx:id="emailErrorLabel" textFill="RED" wrapText="true" maxWidth="Infinity" style="-fx-font-size: 11px;"/>
 
-    <Label fx:id="messageLabel" wrapText="true" textFill="RED" maxWidth="Infinity"/>
+            <Label text="Password" style="-fx-font-weight: bold; -fx-font-size: 12px;" maxWidth="Infinity"/>
+            <HBox spacing="6" alignment="CENTER_LEFT">
+                <StackPane HBox.hgrow="ALWAYS">
+                    <PasswordField fx:id="passwordField" promptText="Your password" maxWidth="Infinity"/>
+                    <TextField fx:id="passwordVisibleField" promptText="Your password" maxWidth="Infinity"
+                               managed="false" visible="false"/>
+                </StackPane>
+                <Button fx:id="togglePasswordBtn" text="👁" onAction="#handleTogglePassword"
+                        style="-fx-padding: 4 10 4 10;"/>
+            </HBox>
+            <Label fx:id="passwordErrorLabel" textFill="RED" wrapText="true" maxWidth="Infinity" style="-fx-font-size: 11px;"/>
 
-    <Button fx:id="loginButton" text="Log In" onAction="#handleLogin"
-            defaultButton="true" maxWidth="Infinity"
-            style="-fx-font-size: 14px; -fx-padding: 8 0 8 0;"/>
+            <Label fx:id="messageLabel" wrapText="true" textFill="RED" maxWidth="Infinity"/>
+            <Region prefHeight="4"/>
 
-    <Hyperlink text="Forgot password?" onAction="#handleForgotPassword"/>
+            <Button fx:id="loginButton" text="Log In" onAction="#handleLogin"
+                    defaultButton="true" maxWidth="Infinity"
+                    style="-fx-background-color: #1A5276; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 0 10 0;"/>
 
-    <Hyperlink text="Don't have an account? Register here"
-               onAction="#goToRegister"/>
-
-</VBox>
+            <Hyperlink text="Forgot password?" onAction="#handleForgotPassword"/>
+            <Hyperlink text="Don't have an account? Register here" onAction="#goToRegister"/>
+        </VBox>
+    </VBox>
+</HBox>

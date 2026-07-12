@@ -11,20 +11,22 @@ public class SceneManager {
 
     private static Stage primaryStage;
 
-    // ── Set the main window ───────────────────────
     public static void setStage(Stage stage) {
         primaryStage = stage;
     }
 
-    // ── Switch to a different screen ─────────────
     public static void switchScene(String fxmlPath, String title) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     SceneManager.class.getResource(fxmlPath)
             );
             Parent root = loader.load();
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(
+                    SceneManager.class.getResource("/com/sahara/view/sahara-theme.css").toExternalForm()
+            );
             primaryStage.setTitle("Sahara — " + title);
-            primaryStage.setScene(new Scene(root));
+            primaryStage.setScene(scene);
             primaryStage.show();
         } catch (IOException e) {
             System.out.println("Screen not found: " + fxmlPath);
@@ -32,7 +34,6 @@ public class SceneManager {
         }
     }
 
-    // ── Get the current stage ─────────────────────
     public static Stage getStage() {
         return primaryStage;
     }

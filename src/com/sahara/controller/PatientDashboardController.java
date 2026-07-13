@@ -23,7 +23,7 @@ import java.util.Optional;
 public class PatientDashboardController {
 
     @FXML private Label welcomeLabel;
-
+    @FXML private Button notificationBellBtn;
     @FXML private ComboBox<String> tierFilter;
     @FXML private TableView<CaregiverRow> caregiverTable;
     @FXML private TableColumn<CaregiverRow, String>  colName;
@@ -50,6 +50,7 @@ public class PatientDashboardController {
     private final HospitalDAO   hospitalDAO   = new HospitalDAO();
     private final UserDAO       userDAO       = new UserDAO();
     private final FeedbackDAO   feedbackDAO   = new FeedbackDAO();
+    private final NotificationDAO notificationDAO = new NotificationDAO();
 
     private List<CareTier>  allTiers;
     private List<Caregiver> currentCaregivers;
@@ -108,8 +109,45 @@ public class PatientDashboardController {
 
         loadCaregivers();
         loadBookings();
+        refreshNotificationBadge();
+    }
+    private void refreshNotificationBadge() {
+        int unread = notificationDAO.getUnreadCount(SessionManager.getUserId());
+        notificationBellBtn.setText(unread > 0 ? "🔔 (" + unread + ")" : "🔔");
     }
 
+    @FXML
+    private void handleNotifications(ActionEvent event) {
+        int userId = SessionManager.getUserId();
+        List<Notification> notifications = notificationDAO.getNotificationsByUserId(userId);
+
+        ListView<String> list = new ListView<>();
+        ObservableList<String> items = FXCollections.observableArrayList();
+        if (notifications.isEmpty()) {
+            items.add("You have no notifications yet.");
+        } else {
+            for (Notification n : notifications) {
+                String prefix = n.isRead() ? "⚪" : "🔴";
+                items.add(prefix + "  " + n.getMessage());
+            }
+        }
+        list.setItems(items);
+        list.setPrefSize(380, 300);
+
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Notifications");
+        dialog.setHeaderText("🔴 = unread   ⚪ = read");
+        dialog.getDialogPane().setContent(list);
+
+        ButtonType markAllBtn = new ButtonType("Mark All as Read", ButtonBar.ButtonData.OTHER);
+        dialog.getDialogPane().getButtonTypes().addAll(markAllBtn, ButtonType.CLOSE);
+
+        Button markAllButtonNode = (Button) dialog.getDialogPane().lookupButton(markAllBtn);
+        markAllButtonNode.setOnAction(e -> notificationDAO.markAllAsRead(userId));
+
+        dialog.showAndWait();
+        refreshNotificationBadge();
+    }
     private void loadCaregivers() {
         int tierIndex = tierFilter.getSelectionModel().getSelectedIndex();
         if (tierIndex > 0) {
@@ -323,6 +361,14 @@ public class PatientDashboardController {
         result.ifPresent(booking -> {
             int bookingId = bookingDAO.createBooking(booking);
             if (bookingId != -1) {
+                Caregiver bookedCaregiver = caregiverDAO.getCaregiverById(selected.caregiverId);
+                if (bookedCaregiver != null) {
+                    Notification n = new Notification();
+                    n.setUserId(bookedCaregiver.getUserId());
+                    n.setMessage("You have a new booking request from "
+                            + SessionManager.getName() + ".");
+                    notificationDAO.createNotification(n);
+                }
                 showAlert("Booking confirmed! Your Booking ID: "
                         + bookingId);
                 loadBookings();

@@ -24,6 +24,15 @@ public class AdminDashboardController {
     @FXML private Label totalBookingsLabel;
 
     // ── Caregivers ─────────────────────────────────
+    // ── Patients ────────────────────────────────────
+    @FXML private TableView<PatientView> patientTable;
+    @FXML private TableColumn<PatientView, String>  ptNameCol;
+    @FXML private TableColumn<PatientView, String>  ptEmailCol;
+    @FXML private TableColumn<PatientView, String>  ptPhoneCol;
+    @FXML private TableColumn<PatientView, String>  ptGenderCol;
+    @FXML private TableColumn<PatientView, Integer> ptAgeCol;
+    @FXML private TableColumn<PatientView, String>  ptAddressCol;
+    @FXML private TableColumn<PatientView, String>  ptEmergencyCol;
     @FXML private TableView<CaregiverView> caregiverTable;
     @FXML private TableColumn<CaregiverView, String>  cgNameCol;
     @FXML private TableColumn<CaregiverView, String>  cgGenderCol;
@@ -82,11 +91,13 @@ public class AdminDashboardController {
     private void initialize() {
         if (welcomeLabel != null)
             welcomeLabel.setText("Welcome, " + SessionManager.getName());
+        setupPatientTable();
         setupCaregiverTable();
         setupBookingTable();
         setupHospitalTable();
         setupNotificationTable();
         setupMemberForm();
+        refreshPatients();
         refreshStatistics();
         refreshCaregivers();
         refreshBookings();
@@ -273,10 +284,23 @@ public class AdminDashboardController {
     // ─────────────────────────────────────────────
     // ADD MEMBER
     // ─────────────────────────────────────────────
-    // TODO (simran): implement this - refreshPatients() was called but never written
+    private void setupPatientTable() {
+        if (patientTable == null) return;
+        ptNameCol.setCellValueFactory(new PropertyValueFactory<>("fullName"));
+        ptEmailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
+        ptPhoneCol.setCellValueFactory(new PropertyValueFactory<>("phone"));
+        ptGenderCol.setCellValueFactory(new PropertyValueFactory<>("gender"));
+        ptAgeCol.setCellValueFactory(new PropertyValueFactory<>("age"));
+        ptAddressCol.setCellValueFactory(new PropertyValueFactory<>("address"));
+        ptEmergencyCol.setCellValueFactory(new PropertyValueFactory<>("emergencyContact"));
+    }
+
     private void refreshPatients() {
-        // placeholder so the project compiles - fill in real logic later
-    }  private void setupMemberForm() {
+        if (patientTable == null) return;
+        patientTable.setItems(FXCollections.observableArrayList(
+                patientDAO.getAllPatientsWithNames()));
+    }
+    private void setupMemberForm() {
         if (memberRoleCombo != null)
             memberRoleCombo.setItems(FXCollections.observableArrayList(
                     "PATIENT", "CAREGIVER", "ADMIN"));
